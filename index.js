@@ -124,7 +124,20 @@ app.put("/leads/:id",async (req,res) => {
             res.status(404).json({"error": `Lead with ID ${req.params.id} not found.`})
         }
     } catch (error) {
-        console.log(error)
+        res.status(500).json({"error":"Failed to update lead data"})
+    }
+})
+app.delete("/leads/:id",async(req,res)=>{
+    try {
+        const deletedData=await Lead.findByIdAndDelete(req.params.id)
+        if(deletedData){
+res.status(200).json({
+    "message": "Lead deleted successfully."
+})
+        }else{
+            res.status(404).json({"error":`Lead with ${req.params.id} not found.`})
+        }
+    } catch (error) {
         res.status(500).json({"error":"Failed to update lead data"})
     }
 })
