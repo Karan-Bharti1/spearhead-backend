@@ -95,6 +95,18 @@ console.log(error)
         res.status(500).json({"error":"Failed to post lead"})
     }
 })
+app.get("/leads",async (req,res) => {
+    try {
+        const data=await Lead.find().populate("salesAgent")
+        if(data && data.length>0){
+            res.status(200).json(data)
+        }else{
+            res.status(404).json({"error":"Leads data not found."})
+        } 
+    } catch (error) {
+        res.status(500).json({"error":"Failed to get Leads data"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
