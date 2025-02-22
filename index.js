@@ -107,6 +107,27 @@ app.get("/leads",async (req,res) => {
         res.status(500).json({"error":"Failed to get Leads data"})
     }
 })
+const updateData=async(id, data)=>{
+try {
+ const lead=await Lead.findByIdAndUpdate(id,data,{new:true})   
+ return lead
+} catch (error) {
+    throw error
+}
+}
+app.put("/leads/:id",async (req,res) => {
+    try {
+        const data=await updateData(req.params.id,req.body)
+        if(data ){
+            res.status(200).json(data)
+        }else{
+            res.status(404).json({"error": `Lead with ID ${req.params.id} not found.`})
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({"error":"Failed to update lead data"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
