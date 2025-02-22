@@ -63,6 +63,38 @@ app.get("/salesAgent",async(req,res)=>{
         res.status(500).json({"error":"Failed to get sales agent's data"})
     }
 })
+const createLead=async (data) => {
+    try {
+        const lead=await Lead(data)
+        return lead.save()
+    } catch (error) {
+        throw error
+    }
+}
+app.post("/leads",async (req,res) => {
+    const {name,source,salesAgent}=req.body
+    try {
+       if(!name || typeof name !== "string"){
+        return res.status(400).json({ "error": `Invalid input: name is required.`
+        })
+       } 
+       if(!source || typeof source !== "string"){
+        return res.status(400).json({ "error": `Invalid input: source is required.`
+        })
+       } 
+       const existingAgent=await Sales.findById(salesAgent)
+       if(existingAgent){
+        const lead=await createLead(req.body)
+        return res.status(200).json(lead)
+       }
+       if(!existingAgent){
+return res.status(404).json({"error": `Sales agent with ID ${salesAgent} not found.`})
+       }
+    } catch (error) {
+console.log(error)
+        res.status(500).json({"error":"Failed to post lead"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
