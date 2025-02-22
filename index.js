@@ -1,1 +1,6 @@
+const {nitialiseDatabase, initialiseDatabase}=require("./database/database.connection")
 const Lead=require("./models/Lead")
+const Comment=require("./models/Comment")
+const Sales=require("./database/database.connection")
+const Tag=require("./database/database.connection")
+initialiseDatabase()
