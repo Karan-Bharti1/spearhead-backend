@@ -3,7 +3,7 @@ const cors=require("cors")
 const Lead=require("./models/Lead")
 const Comment=require("./models/Comment")
 const Sales=require("./models/Sales")
-const Tag=require("./database/database.connection")
+const Tag=require("./models/Tag")
 const PORT=3000
 const express=require('express')
 const app=express()
@@ -20,7 +20,7 @@ const createNewAgent=async (data) => {
     const {name,email}=data
     // Name Validation
     if(!name|| typeof name !== 'string' ){
-        throw new Error("Invalid input: 'name' is required and must be a string.")
+        throw new Error(`Invalid input: ${name} is required and must be a string.`)
     }
     const agent=new Sales(data)
     const save=await agent.save()
@@ -34,21 +34,33 @@ app.post("/salesagent",async (req,res) => {
     const {name,email}=req.body
     if(!email || typeof email !== 'string' || !email.includes('@')|| !email.includes('.')|| email.indexOf('@')>= email.indexOf("."))
         {
-        res.status(400).json({ "error": `Invalid input: ${email} must be a valid email address.`
+       return res.status(400).json({ "error": `Invalid input: ${email} must be a valid email address.`
         })}
     const existingAgent=await Sales.findOne({email})
     if (existingAgent) {
-        res.status(409).json({ "error": `Sales agent with email ${email} already exists.`
+       return res.status(409).json({ "error": `Sales agent with email ${email} already exists.`
         })
     }
-    if(!existingAgent)
-    {const agent=await createNewAgent(req.body)
-        if(agent) {res.status(200).json(agent)}
-    }
+    
+    const agent=await createNewAgent(req.body)
+        if(agent) {return res.status(200).json(agent)}
+    
     
        
     } catch (error) {
         res.status(400).json({ error: error.message })
+    }
+})
+app.get("/salesAgent",async(req,res)=>{
+    try {
+        const data=await Sales.find()
+        if(data && data.length>0){
+            res.status(200).json(data)
+        }else{
+            res.status(404).json({"error":"Sales Agent's data not found."})
+        }
+    } catch (error) {
+        res.status(500).json({"error":"Failed to get sales agent's data"})
     }
 })
 app.listen(PORT,()=>{
