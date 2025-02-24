@@ -190,7 +190,19 @@ app.post("/leads/:id/comments",async(req,res)=>{
         return res.status(500).json({ error: 'Failed to add comment to lead.' });
     }
 })
-
+app.get("/leads/:id/comments",async(req,res)=>{
+    const {id}=req.params
+    const comments=await Comment.find({"lead":id}).populate("lead").populate("author")
+    try {
+        if(comments){
+            res.status(200).json(comments)
+        }else{
+            res.status(404).json({"error":"Comments not found."})
+        }
+    } catch (error) {
+        res.status(500).json({"error":"Failed to fetch comments"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
