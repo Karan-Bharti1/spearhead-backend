@@ -205,6 +205,24 @@ app.get("/leads/:id/comments",async(req,res)=>{
         res.status(500).json({"error":"Failed to fetch comments"})
     }
 })
+app.get("/report/last-week",async(req,res)=>{
+    try {
+        
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch closed leads." });
+    }
+})
+app.post("/tag",async(req,res)=>{
+    try {
+   const tag=new Tag(req.body)     
+   const saved=await tag.save()
+   if(saved){
+    res.json(saved)
+   }
+    } catch (error) {
+        res.status(500).json({error:"fail to add tag"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
