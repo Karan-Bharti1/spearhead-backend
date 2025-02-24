@@ -147,7 +147,18 @@ res.status(200).json({
         res.status(500).json({"error":"Failed to update lead data"})
     }
 })
-
+app.get("/report/pipeline",async(req,res)=>{
+    const leadsData=await Lead.find()
+    try {
+        if(leadsData && leadsData.length>0){
+            res.status(200).json({"totalLeadsInPipeline":leadsData.length})
+        }else{
+            res.status(404).json({"error":"leads data not found"})
+        }
+    } catch (error) {
+        res.status(500).json({"error":"Failed to fetch total  number of leads"})
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
