@@ -169,21 +169,23 @@ const createComment=async (data) => {
 }
 app.post("/leads/:id/comments",async(req,res)=>{
     const {id}=req.params
-    const {commentText,author}=req.body
+    const {commentText}=req.body
     try {
         const lead =await Lead.findById(id)
         if(!lead){
           return res.status(404).json({ "error": `Lead with ID '${id}' not found.` });
         }
-        const existingAuthor=await Sales.findById( author)
-        if(!existingAuthor || typeof author !== 'string'){
+        console.log(lead)
+        const existingAuthor=await Sales.findById(lead.salesAgent)
+        
+        if(!existingAuthor ){
            return res.status(400).json({"error":"Please add a valid author Id"})
         }
         if (!commentText || typeof commentText !== 'string') {
             return res.status(400).json({ "error": 'Invalid input: commentText is required and must be a string.' });
           }
          
-          const savedComment=await createComment(req.body)
+          const savedComment=await createComment({commentText,author:existingAuthor,"lead":id})
           return res.status(200).json(savedComment)
     } catch (error) {
        console.log(error)
