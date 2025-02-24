@@ -22,9 +22,10 @@ const leadSchema = new mongoose.Schema({
     enum: ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Closed'],  // Predefined lead statuses
     default: 'New',
   },
-  tags: {
-    type: [mongoose.Schema.Types.ObjectId],  
-  },
+  tags: [{
+    type: mongoose.Schema.Types.ObjectId
+    , ref: "Tag"  
+  }],
   timeToClose: {
     type: Number,
     required: [true, 'Time to Close is required'],

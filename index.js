@@ -98,7 +98,7 @@ console.log(error)
 app.get("/leads",async (req,res) => {
     try {
         const { salesAgent, status, tags, source } = req.query;
-        const data=await Lead.find().populate("salesAgent")
+        const data=await Lead.find().populate("salesAgent").populate("tags")
         if(data && data.length>0){
             res.status(200).json(data)
         }else{
