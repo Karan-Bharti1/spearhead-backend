@@ -159,6 +159,38 @@ app.get("/report/pipeline",async(req,res)=>{
         res.status(500).json({"error":"Failed to fetch total  number of leads"})
     }
 })
+const createComment=async (data) => {
+  try {
+   const comment=new Comment(data)
+   return await  comment.save() 
+  } catch (error) {
+    throw error
+  }  
+}
+app.post("/leads/:id/comments",async(req,res)=>{
+    const {id}=req.params
+    const {commentText,author}=req.body
+    try {
+        const lead =await Lead.findById(id)
+        if(!lead){
+          return res.status(404).json({ "error": `Lead with ID '${id}' not found.` });
+        }
+        const existingAuthor=await Sales.findById( author)
+        if(!existingAuthor || typeof author !== 'string'){
+           return res.status(400).json({"error":"Please add a valid author Id"})
+        }
+        if (!commentText || typeof commentText !== 'string') {
+            return res.status(400).json({ "error": 'Invalid input: commentText is required and must be a string.' });
+          }
+         
+          const savedComment=await createComment(req.body)
+          return res.status(200).json(savedComment)
+    } catch (error) {
+       console.log(error)
+        return res.status(500).json({ error: 'Failed to add comment to lead.' });
+    }
+})
+
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
