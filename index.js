@@ -223,6 +223,45 @@ app.post("/tag",async(req,res)=>{
         res.status(500).json({error:"fail to add tag"})
     }
 })
+app.get("/tags",async(req,res)=>{
+    try {
+        const tags=await Tag.find()
+        if(tags && tags.length>0){
+            res.status(200).json(tags)
+        }else{
+            res.status(404).json({error:"Tags data not not found."})
+        }
+    } catch (error) {
+        res.status(500).json({error:"failed to get tags data"})
+    }
+})
+app.get("/report/lastweek",async(req,res)=>{
+    try {
+      const  currentDate=new Date()
+      currentDate.setHours(23,59,59,999)
+      const lastDate=new Date()
+      lastDate.setDate(currentDate.getDate()-7)
+      lastDate.setHours(0,0,0,0)
+      const leads=await Lead.find({
+        status: "Closed",
+        closedAt:{ $gte :lastDate,$lte: currentDate}
+      }).populate("salesAgent").populate("tags")
+      if (leads.length > 0) {
+        const formattedLeads = leads.map(lead => ({
+            id: lead._id,
+            name: lead.name,
+            salesAgent: lead.salesAgent.name, // Assuming 'salesAgent' has a 'name' field
+            closedAt: lead.closedAt
+        }))
+        return res.status(200).json(formattedLeads); 
+      } else {
+       return res.status(404).json({ error: "No leads closed in the last 7 days." });
+      }
+    } catch (error) {
+        console.log(error)
+      return  res.status(500).json({ error: "Failed to fetch closed leads." });
+    }
+})
 app.listen(PORT,()=>{
     console.log("Server is running on PORT: ",PORT)
 })
