@@ -95,24 +95,61 @@ console.log(error)
         res.status(500).json({"error":"Failed to post lead"})
     }
 })
-app.get("/leads",async (req,res) => {
+// app.get("/leads",async (req,res) => {
+//     try {
+//         const { salesAgent, status, tags, source } = req.query;
+//         const data=await Lead.find().populate("salesAgent").populate("tags")
+//         if(data && data.length>0){
+//             res.status(200).json(data)
+//         }else{
+//             res.status(404).json({"error":"Leads data not found."})
+//         } 
+//         if (status && !allowedStatuses.includes(status)) {
+//             return res.status(400).json({ 
+//               "error": `Invalid input: 'status' must be one of ${JSON.stringify(allowedStatuses)}.` 
+//             });
+//           }
+//     } catch (error) {
+//         res.status(500).json({"error":"Failed to get Leads data"})
+//     }
+// })
+app.get("/leads", async (req, res) => {
     try {
-        const { salesAgent, status, tags, source } = req.query;
-        const data=await Lead.find().populate("salesAgent").populate("tags")
-        if(data && data.length>0){
-            res.status(200).json(data)
-        }else{
-            res.status(404).json({"error":"Leads data not found."})
-        } 
+      const { salesAgent, status, tags, source } = req.query;
+      const allowedStatuses=['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Closed']
+      let filter = {};
+      
+    
+      if (salesAgent) {
+        filter.salesAgent = salesAgent;
+      }
+      
+      if (status) {
+      
         if (status && !allowedStatuses.includes(status)) {
-            return res.status(400).json({ 
-              "error": `Invalid input: 'status' must be one of ${JSON.stringify(allowedStatuses)}.` 
-            });
-          }
+          return res.status(400).json({ 
+            "error": `Invalid input: 'status' must be one of ${JSON.stringify(allowedStatuses)}.` 
+          });
+        }
+        filter.status = status;
+      }
+      if (tags) {
+       
+        filter.tags = Array.isArray(tags) ? { $in: tags } : tags;
+      }
+      if (source) {
+        filter.source = source;
+      }
+      
+      const data = await Lead.find(filter).populate("salesAgent").populate("tags");
+      
+      return res.status(200).json(data);
+      
     } catch (error) {
-        res.status(500).json({"error":"Failed to get Leads data"})
+      console.error("Error fetching leads:", error);
+      res.status(500).json({"error": "Failed to get Leads data"});
     }
-})
+  });
 const updateData=async(id, data)=>{
 try {
  const lead=await Lead.findByIdAndUpdate(id,data,{new:true})   
