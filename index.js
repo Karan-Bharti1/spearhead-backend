@@ -115,11 +115,10 @@ console.log(error)
 // })
 app.get("/leads", async (req, res) => {
     try {
-      const { salesAgent, status, tags, source } = req.query;
+      const { salesAgent, status, tags, source,priority } = req.query;
       const allowedStatuses=['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Closed']
       let filter = {};
       
-    
       if (salesAgent) {
         filter.salesAgent = salesAgent;
       }
@@ -140,7 +139,9 @@ app.get("/leads", async (req, res) => {
       if (source) {
         filter.source = source;
       }
-      
+      if(priority){
+        filter.priority=priority
+      }
       const data = await Lead.find(filter).populate("salesAgent").populate("tags");
       
       return res.status(200).json(data);
