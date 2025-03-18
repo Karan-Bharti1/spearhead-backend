@@ -181,3 +181,15 @@ module.exports = mongoose.model('Tag', tagSchema);
 
 ```
 
+## Middlewares and Cors
+
+```javascript
+app.use(express.json())// Middleware
+const cors=require('cors')
+const corsOptions={
+    origin:"*",
+    credentials:true,
+    optionsSuccessStatus:200
+}
+app.use(cors(corsOptions))// Cors
+```
