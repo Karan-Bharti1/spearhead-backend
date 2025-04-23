@@ -292,6 +292,8 @@ app.get("/report/lastweek",async(req,res)=>{
             closedAt: lead.closedAt
         }))
         return res.status(200).json(formattedLeads); 
+      }else if(leads.length==0){
+        res.status(200).json({message:"No Leads Found"})
       } else {
        return res.status(404).json({ error: "No leads closed in the last 7 days." });
       }
